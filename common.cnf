@@ -1,0 +1,161 @@
+# mysql-server-comm.cnf 此文件为所有 mysql 数据库公用配置文件
+[client]
+default-character-set = utf8mb4
+
+[mysql_safe]
+default-character-set = utf8mb4
+
+[mysql]
+default-character-set = utf8mb4
+
+[mysqldump]
+quick
+quote-names
+max_allowed_packet  = 16M
+
+[mysqld]
+# MySQL 服务的唯一编号 几个 MySQL 服务 ID 需唯一(集群中)
+server-id = 1 
+
+
+# docker mysql image /etc/mysql/conf.d/docker.cnf已经有以下2个配置了
+skip-host-cache
+skip-name-resolve
+
+# 修改时区为东8区
+default-time-zone = '+8:00'
+
+#pid-file      = /var/run/mysqld/mysqld.pid
+#socket        = /var/run/mysqld/mysqld.sock
+# 数据库的数据存放目录
+datadir       = /var/lib/mysql
+# 错误日志
+log-error    = /var/lib/mysql/mysql-error.log
+
+# 跳过密码登陆(取消注释重置 root 密码)
+# skip-grant-tables
+
+# 设置默认排序规则
+collation-server         = utf8mb4_unicode_ci
+
+# 客户端跟服务器字符编码不一致时拒绝连接
+character-set-client-handshake = TRUE
+
+# 指定初始化连接时的字符编码
+init_connect          = 'SET NAMES utf8mb4' 
+init_connect          = 'SET collation_connection = utf8mb4_unicode_ci'
+
+
+# 时间格式的 0000 不报错处理
+sql_mode = NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO
+
+
+# 创建新表时将使用的默认存储引擎
+default-storage-engine = INNODB
+
+# 锁定等待时间由默认的50s 修改为500s
+innodb_lock_wait_timeout = 500
+
+# 事务隔离级别，默认为可重复读，mysql默认可重复读级别（此级别下可能参数很多间隙锁，影响性能）
+transaction_isolation = READ-COMMITTED
+
+# 表名不分区大小写
+lower_case_table_names=1
+
+# 设置client连接mysql时的字符集,防止乱码
+init_connect='SET NAMES utf8mb4'
+
+# 最大连接数
+max_connections = 400
+
+# 最大错误连接数
+max_connect_errors = 1000
+
+# TIMESTAMP如果没有显示声明NOT NULL，允许NULL值
+explicit_defaults_for_timestamp = true
+
+# SQL数据包发送的大小，如果有BLOB对象建议修改成1G
+max_allowed_packet = 128M
+
+# 代表受信任的函数创建者，也就是使MySQL不对函数做出限制
+log_bin_trust_function_creators = 1
+
+# 旧密码插件
+#default-authentication-plugin = mysql_native_password
+
+# MySQL连接闲置超过一定时间后(单位：秒)将会被强行关闭
+# MySQL默认的wait_timeout  值为8个小时, interactive_timeout参数需要同时配置才能生效
+interactive_timeout = 1800
+wait_timeout = 1800
+
+# 内部内存临时表的最大值 ，设置成128M。
+# 比如大数据量的group by ,order by时可能用到临时表，
+# 超过了这个值将写入磁盘，系统IO压力增大
+tmp_table_size = 134217728
+max_heap_table_size = 134217728
+
+
+# 慢查询sql日志设置
+slow_query_log = 1
+slow_query_log_file = /var/lib/mysql/mysql-slow.log
+
+# 检查未使用到索引的sql
+log_queries_not_using_indexes = 1
+
+# 针对log_queries_not_using_indexes开启后，记录慢sql的频次、每分钟记录的条数
+log_throttle_queries_not_using_indexes = 5
+
+# 作为从库时生效,从库复制中如何有慢sql也将被记录
+log_slow_slave_statements = 1
+
+# 慢查询执行的秒数，必须达到此值可被记录
+long_query_time = 8
+
+# 检索的行数必须达到此值才可被记为慢查询
+min_examined_row_limit = 100
+
+##########################################
+#                binlog                  #
+##########################################
+# mysql binlog日志文件保存的过期时间，过期后自动删除 7 天 = 7 * 24 * 60 * 60
+binlog_expire_logs_seconds = 604800
+
+# 要同步的库
+# binlog_do_db = mydb # 不指定则同步全部库
+
+# 复制过滤：也就是指定哪个数据库不用同步（mysql库一般不同步）
+binlog-ignore-db = mysql  
+
+# 开启二进制日志功能，可以随便取，最好有含义（关键就是这里了）
+log-bin=master-bin
+log-bin-index=master-bin.index
+# 开启二进制日志功能，以备Slave作为其它Slave的Master时使用
+# log-bin=/slave1-bin
+
+#每个bin-log最大大小，当此大小等于500M时会自动生成一个新的日志文件。一条记录不会写在2个日志文件中，所以有时日志文件会超过此大小。
+max-binlog-size = 500M
+
+# 为每个session分配的内存，在事务过程中用来存储二进制日志的缓存
+binlog-cache-size = 1M
+
+# 主从复制的格式（mixed,statement,row，默认格式是statement）
+binlog-format = mixed
+
+# 跳过主从复制中遇到的所有错误或指定类型的错误，避免slave端复制中断。
+# 如：1062错误是指一些主键重复，1032错误是因为主从数据库数据不一致
+slave-skip-errors = 1062
+
+
+##########################################
+#            slave-setting               #
+##########################################
+
+
+# 从库开启log-bin参数，如果直接往从库写数据，是可以记录log-bin日志的，但是从库通过I0线程读取主库二进制日志文件，然后通过SQL线程写入的数据，是不会记录binlog日志的。也就是说从库从主库上复制的数据，是不写入从库的binlog日志的。所以从库做为其他从库的主库时需要在配置文件中添加log-slave-updates参数
+# log-slave-updates = 1
+
+# relay_log配置中继日志
+# relay-log = replicas-mysql-relay-bin  
+
+# 防止改变数据(除了特殊的线程)
+# read-only = 1

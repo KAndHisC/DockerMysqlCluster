@@ -5,11 +5,12 @@ networks:
 services:
   mysql_master:
     image: mysql:8
+    command: --default-authentication-plugin=mysql_native_password
     environment:
       - MYSQL_ROOT_PASSWORD=safe@2019
       - MYSQL_LOWER_CASE_TABLE_NAMES=0
     container_name: "mysql_master"
-    restart: "no"
+    restart: always
     ports:
       - 4406:3306
     volumes:
@@ -20,11 +21,12 @@ services:
 
   mysql_slave:
     image: mysql:8
+    command: --default-authentication-plugin=mysql_native_password
     environment:
       - MYSQL_ROOT_PASSWORD=safe@2019
       - MYSQL_LOWER_CASE_TABLE_NAMES=0
     container_name: "mysql_slave"
-    restart: "no"
+    restart: always
     ports:
       - 5506:3306
     depends_on:

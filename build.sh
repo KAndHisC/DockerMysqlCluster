@@ -36,8 +36,10 @@ for container in "${all_containers[@]}";do
   done
 done
 
+echo "连接成功"
+
 #################### 主服务器操作 ####################开始
-# 在主服务器上添加数据库用户
+# 在主服务器上添加从服务器连接权限
 priv_stmt='GRANT REPLICATION SLAVE ON *.* TO "'$mysql_user'"@"%"; FLUSH PRIVILEGES;'
 
 docker exec $master_container sh -c "export MYSQL_PWD='$root_password'; mysql -u root -e '$priv_stmt'"
