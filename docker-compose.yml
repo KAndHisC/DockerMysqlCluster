@@ -12,7 +12,7 @@ services:
     ports:
       - 4406:3306
     volumes:
-      - ./master/conf/mysql.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf
+      - ./master/conf/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
       - ./master/data:/var/lib/mysql
     networks:
       - fate-network
@@ -28,7 +28,7 @@ services:
     depends_on:
       - mysql_master
     volumes:
-      - ./slave/conf/mysql.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf
+      - ./slave/conf/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
       - ./slave/data:/var/lib/mysql
     networks:
       - fate-network
