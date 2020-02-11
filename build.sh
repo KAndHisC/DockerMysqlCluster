@@ -16,7 +16,7 @@ retry_duration=5
 
 #################### 函数定义 ####################
 # 获取服务器的ip
-docker-ip() {
+dockerIP() {
     docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$@"
 }
 
@@ -53,7 +53,7 @@ CURRENT_POS=`echo $MS_STATUS | awk '{print $7}'`
 #################### 从服务器操作 ####################开始
 # 设置从服务器与主服务器互通命令
 start_slave_stmt="CHANGE MASTER TO
-        MASTER_HOST='$(docker-ip $master_container)',
+        MASTER_HOST='$(dockerIP $master_container)',
         MASTER_USER='$mysql_user',
         MASTER_PASSWORD='$mysql_password',
         MASTER_LOG_FILE='$CURRENT_LOG',
