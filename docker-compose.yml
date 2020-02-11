@@ -5,22 +5,24 @@ networks:
 services:
   mysql_master:
     image: mysql:8
-    env_file:
-      - ./master/mysql_master.env
+    environment:
+      - MYSQL_ROOT_PASSWORD=safe@2019
+      - MYSQL_LOWER_CASE_TABLE_NAMES=0
     container_name: "mysql_master"
     restart: "no"
     ports:
       - 4406:3306
     volumes:
-      - ./master/conf/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
+      - ./master/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
       - ./master/data:/var/lib/mysql
     networks:
       - fate-network
 
   mysql_slave:
     image: mysql:8
-    env_file:
-      - ./slave/mysql_slave.env
+    environment:
+      - MYSQL_ROOT_PASSWORD=safe@2019
+      - MYSQL_LOWER_CASE_TABLE_NAMES=0
     container_name: "mysql_slave"
     restart: "no"
     ports:
@@ -28,7 +30,7 @@ services:
     depends_on:
       - mysql_master
     volumes:
-      - ./slave/conf/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
+      - ./slave/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
       - ./slave/data:/var/lib/mysql
     networks:
       - fate-network

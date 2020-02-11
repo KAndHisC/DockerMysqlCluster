@@ -38,7 +38,7 @@ done
 
 #################### 主服务器操作 ####################开始
 # 在主服务器上添加数据库用户
-priv_stmt='GRANT REPLICATION SLAVE ON *.* TO "'$mysql_user'"@"%" IDENTIFIED BY "'$mysql_password'"; FLUSH PRIVILEGES;'
+priv_stmt='GRANT REPLICATION SLAVE ON *.* TO "'$mysql_user'"@"%"; FLUSH PRIVILEGES;'
 
 docker exec $master_container sh -c "export MYSQL_PWD='$root_password'; mysql -u root -e '$priv_stmt'"
 
