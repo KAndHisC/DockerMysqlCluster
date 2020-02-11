@@ -1,6 +1,6 @@
 #!/bin/bash
 #################### 变量定义 ####################
-mysql_user="datasafe"    # 主服务器允许从服务器登录的用户名
+mysql_user="root"    # 主服务器允许从服务器登录的用户名
 mysql_password="safe@2019" # 主服务器允许从服务器登录的密码
 root_password="safe@2019"             # 每台服务器的root密码
 # 主库列表
